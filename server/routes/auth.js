@@ -1,4 +1,9 @@
 var jwt = require('jwt-simple');
+var mongoose = require('mongoose');
+var db = require('../config/db.js')();
+console.log('mongoose docs: http://mongoosejs.com/docs/index.html');
+
+console.log('db config: ', db.connection);
  
 var auth = {
  
