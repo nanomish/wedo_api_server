@@ -1,9 +1,19 @@
 var jwt = require('jwt-simple');
 var mongoose = require('mongoose');
-var db = require('../config/db.js')();
-console.log('mongoose docs: http://mongoosejs.com/docs/index.html');
+var config = require('../config/db.js')();
+var userSchema = require('../schemas/user.js');
+var User = mongoose.model('User', userSchema);
 
-console.log('db config: ', db.connection);
+
+var db = mongoose.connection;
+
+db.once('open', function() {
+  //var User = mongoose.model('User', userSchema);
+});
+
+console.log('mongoose docs: http://mongoosejs.com/docs/index.html');
+console.log('db config: ', config.connection);
+mongoose.connect(config.connection);
  
 var auth = {
  
@@ -54,25 +64,36 @@ var auth = {
 				"message": "Invalid credentials" });
 			return;
 		} 
-
-		if (!auth.isUniqueUser(username)) {
-			res.status(401);
-			res.json({"status": 401, "message": "This username is already in use"});
-			return;
-		}
-
-		// addNewUserToDB
-		DB_USERS.push({username: req.body.username, password: req.body.password, name: req.body.name, role: req.body.role});
-		res.status(200);
-		res.json({"status": 200, "message": "success"});	
+    
+    User.findOne({username: username}, function(err, user) {
+        if (!!user) {
+          res.status(401);
+          res.json({"status": 401, "message": "This username is already in use"});
+          return;
+        } else {
+          var u = new User({
+             username: req.body.username,
+             password: req.body.password
+          });
+          u.save(function(err, thor) {
+          if (err) return console.error(err);
+            console.log(thor);
+          });
+          res.status(200);
+          res.json({"status": 200, "message": "success"});
+          return;
+        }
+    });
 		return;		
   },
 
   isUniqueUser: function(username) {
-		for (var i=0; i< DB_USERS.length; i++) {
-			if (DB_USERS[i].username == username) return false;
-		}
-		return true;
+    User.findOne({username: username}, function(err, user) {
+      console.log('isUniqueUser() - user:', user);
+      console.log('isUniqueUser() - err :', err);
+      if (!!user) return true;
+      return false;
+    });
 	},
 
 	validateDB: function(user, pass) {
