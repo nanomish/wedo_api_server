@@ -32,25 +32,17 @@ var auth = {
     }
  
     // Fire a query to your DB and check if the credentials are valid
-    var dbUserObj = auth.validateDB(username, password);
-   
-    if (!dbUserObj) { // If authentication fails, we send a 401 back
-      res.status(401);
-      res.json({
-        "status": 401,
-        "message": "Invalid credentials"
-      });
-      return;
-    }
- 
-    if (dbUserObj) {
- 
-      // If authentication is success, we will generate a token
-      // and dispatch it to the client
- 
-      res.json(genToken(dbUserObj));
-    }
- 
+    User.findOne({username: username, password: password}, function(err, user) {
+      if (!!user) {
+        res.json(genToken(dbUserObj));
+      } else {
+       res.status(401);
+       res.json({
+          "status": 401,
+          "message": "Invalid credentials"
+        }); 
+      }
+    return;        
   },
 
   signup: function(req, res) {
@@ -86,15 +78,6 @@ var auth = {
     });
 		return;		
   },
-
-  isUniqueUser: function(username) {
-    User.findOne({username: username}, function(err, user) {
-      console.log('isUniqueUser() - user:', user);
-      console.log('isUniqueUser() - err :', err);
-      if (!!user) return true;
-      return false;
-    });
-	},
 
 	validateDB: function(user, pass) {
 		for (var i=0; i< DB_USERS.length; i++) {
