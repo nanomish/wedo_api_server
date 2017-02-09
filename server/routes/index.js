@@ -3,6 +3,7 @@ var router = express.Router();
  
 var auth = require('./auth.js');
 var products = require('./products.js');
+var lists = require('./lists.js');
 var user = require('./users.js');
  
 /*
@@ -18,7 +19,8 @@ router.get('/api/v1/product/:id', products.getOne);
 router.post('/api/v1/product/', products.create);
 router.put('/api/v1/product/:id', products.update);
 router.delete('/api/v1/product/:id', products.delete);
- 
+
+router.post('/api/v1/list/', lists.create);
 /*
  * Routes that can be accessed only by authenticated & authorized users
  */

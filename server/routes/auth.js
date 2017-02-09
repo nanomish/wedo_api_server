@@ -1,19 +1,14 @@
 var jwt = require('jwt-simple');
 var mongoose = require('mongoose');
-var config = require('../config/db.js')();
-var userSchema = require('../schemas/user.js');
-var User = mongoose.model('User', userSchema);
-
-
+var db_config = require('../config/db.js')();
+//var User = mongoose.model('User', require('../schemas/user.js'));
+var User = mongoose.model('User');
+//TODO - error handeling for connection to DB
 var db = mongoose.connection;
 
-db.once('open', function() {
-  //var User = mongoose.model('User', userSchema);
-});
+//console.log('mongoose docs: http://mongoosejs.com/docs/index.html');
 
-console.log('mongoose docs: http://mongoosejs.com/docs/index.html');
-console.log('db config: ', config.connection);
-mongoose.connect(config.connection);
+//mongoose.connect(db_config.connection, db_config.options);
  
 var auth = {
  
@@ -21,7 +16,6 @@ var auth = {
  
     var username = req.body.username || '';
     var password = req.body.password || '';
-    console.log(' req.body.username', req.body.username); 
     if (username == '' || password == '') {
       res.status(401);
       res.json({
@@ -32,17 +26,22 @@ var auth = {
     }
  
     // Fire a query to your DB and check if the credentials are valid
+    console.log('validating user');
     User.findOne({username: username, password: password}, function(err, user) {
       if (!!user) {
-        res.json(genToken(dbUserObj));
+        res.json(genToken(user));
+        //console.log('response: ', res);
+        //console.log('request: ', req);
       } else {
        res.status(401);
        res.json({
           "status": 401,
-          "message": "Invalid credentials"
+          "message": err
         }); 
       }
+    console.log('User ' + req.body.username + ' logged in');
     return;        
+    });
   },
 
   signup: function(req, res) {
@@ -53,7 +52,8 @@ var auth = {
 			res.status(401);
 			res.json({
 				"status": 401,
-				"message": "Invalid credentials" });
+				"message": "Invalid credentials" 
+      });
 			return;
 		} 
     
@@ -115,7 +115,11 @@ function genToken(user) {
   var token = jwt.encode({
     exp: expires
   }, require('../config/secret')());
- 
+
+  console.log('----------------------------------------------------------');
+  console.log('TOKEN: ', token);
+  console.log('----------------------------------------------------------');
+
   return {
     token: token,
     expires: expires,
