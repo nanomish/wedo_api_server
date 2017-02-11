@@ -7,8 +7,12 @@ var listSchema = new mongoose.Schema({
   date_updated: Date,
   isDeleted: Boolean,
   isArchived: Boolean,
-  test: String,
-  updateTest: String
+  list_items: [{
+    item: Array,
+    status: String,
+    amount: Number,
+    units: String 
+  }]
 });
 
 var List = module.exports = mongoose.model('List', listSchema);
