@@ -1,10 +1,10 @@
 var jwt = require('jwt-simple');
 var mongoose = require('mongoose');
-var db_config = require('../config/db.js')();
+//var db_config = require('../config/db.js')();
 //var User = mongoose.model('User', require('../schemas/user.js'));
 var User = mongoose.model('User');
 //TODO - error handeling for connection to DB
-var db = mongoose.connection;
+//var db = mongoose.connection;
 
 //console.log('mongoose docs: http://mongoosejs.com/docs/index.html');
 

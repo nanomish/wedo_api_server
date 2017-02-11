@@ -13,7 +13,7 @@ mongoose.connect(db_config.CONNECTION_STRING, db_config.CONNECTION_OPTIONS);
 // CONNECTION EVENTS
 // When successfully connected
 mongoose.connection.on('connected', function () {
-  console.log('Mongoose default connection open');
+  console.log('Mongoose default connection open', new Date);
 });
 
 // If the connection throws an error

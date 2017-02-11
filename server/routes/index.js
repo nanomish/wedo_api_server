@@ -21,6 +21,8 @@ router.put('/api/v1/product/:id', products.update);
 router.delete('/api/v1/product/:id', products.delete);
 
 router.post('/api/v1/list/', lists.create);
+router.post('/api/v1/list/:id', lists.update);
+router.get('/api/v1/list/:id', lists.getOne);
 /*
  * Routes that can be accessed only by authenticated & authorized users
  */

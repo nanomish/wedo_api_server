@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
-
-//TODO - error handeling for connection to DB
-var db = mongoose.connection;
+var _ = require('lodash');
+var List = mongoose.model('List');
+var User = mongoose.model('User');
 
 var lists = {
  
@@ -9,8 +9,9 @@ var lists = {
     var newlist = req.body;
     var newList = new List({
       title: req.body.title,
-      access: [{username: req.body.username, type: 'rwd'}]
+      access: [{"username": req.body.username, "type": 'rwd'}]
     });
+    console.log('db ... creating new list, title:', req.body.title)
     newList.save(function(err, lst) {
       if (err) return console.error(err);
       res.status(200);
@@ -18,12 +19,63 @@ var lists = {
       return;
     });
   },
+
+  getOne: function(req, res) {
+    console.log('list.getOne, params:', req.params)
+    var id = req.params.id;
+  
+    return List.findOne({"_id": id}, function(err, list) {
+      if (!!list) {
+        console.log('found one list: ', list);
+        res.status(200);
+        res.json(list);
+        return;
+      }
+      if (!!err) {
+        console.log('error getting one: ', err);
+        res.status(401);
+        res.json({
+          "status": 401,
+          "message": err
+        }); 
+        return;
+      }
+    });
+  },
  
   update: function(req, res) {
-    var updateuser = req.body;
+    var listObj = req.body;
     var id = req.params.id;
-    data[id] = updateuser // Spoof a DB call
-    res.json(updateuser);
+
+    List.findOne({id: req.body._id}, function(err, list){
+      if (!!list) {
+        console.log('found list to update:', list);
+        console.log('============================')
+        list = _.extend(list, listObj, {"date_updated": new Date});
+        console.log('found list to update (obj):', list);
+        list.save(function(err, obj) {
+          if(!!err) {
+            res.status(401);
+            res.json({
+                "status": 401,
+                "message": err
+              });
+            console.error('error updating (save) list (save obj)', obj);  
+            console.error('error updating (save) list', list.title);
+            return;
+          } else {
+            res.status(200);
+            res.json({"status": 200, "message": "success"});
+            console.log('updated saved list, ', list.title);
+            return;
+          }
+        });
+      } else {
+        res.status(401);
+        res.json({"status": 401, message: err})
+      }
+    
+    });
   },
  
   delete: function(req, res) {
