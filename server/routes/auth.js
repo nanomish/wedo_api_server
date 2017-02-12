@@ -26,7 +26,7 @@ var auth = {
     }
  
     // Fire a query to your DB and check if the credentials are valid
-    console.log('validating user');
+    console.log('validating user, ', username);
     User.findOne({username: username, password: password}, function(err, user) {
       if (!!user) {
         res.json(genToken(user));
@@ -67,9 +67,9 @@ var auth = {
              username: req.body.username,
              password: req.body.password
           });
-          u.save(function(err, thor) {
+          u.save(function(err, obj) {
           if (err) return console.error(err);
-            console.log(thor);
+            console.log(obj);
           });
           res.status(200);
           res.json({"status": 200, "message": "success"});

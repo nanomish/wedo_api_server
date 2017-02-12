@@ -49,8 +49,6 @@ var lists = {
 
     List.findOne({id: req.body._id}, function(err, list){
       if (!!list) {
-        console.log('found list to update:', list);
-        console.log('============================')
         list = _.extend(list, listObj, {"date_updated": new Date});
         console.log('found list to update (obj):', list);
         list.save(function(err, obj) {
@@ -59,8 +57,7 @@ var lists = {
             res.json({
                 "status": 401,
                 "message": err
-              });
-            console.error('error updating (save) list (save obj)', obj);  
+              });  
             console.error('error updating (save) list', list.title);
             return;
           } else {
